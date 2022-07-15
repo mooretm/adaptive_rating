@@ -104,9 +104,10 @@ class CSVModel:
         all_data = dict()
         for idx, key in enumerate(keys):
             all_data[keys_formatted[idx]] = temp_sessionpars[key]
-        # Remove audio files dir from dictionary
-        # (No need to write the dir to file)
-        all_data.pop('audio_files_path')
+
+        # Fields to remove from dictionary before saving it
+        all_data.pop('audio_files_path') # Don't care about directory
+        all_data.pop('button_id') # Don't care about last button pressed
 
         # Create new field for trailing underscore naming
         # See naming convention info above

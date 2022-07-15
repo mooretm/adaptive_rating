@@ -85,7 +85,8 @@ class MainFrame(ttk.Frame):
 
         # Submit button
         self.btn_submit = ttk.Button(frm_button, text="Submit", 
-            command=self._on_submit, style='Big.TButton')
+            command=self._on_submit, style='Big.TButton',
+            state="disabled")
         self.btn_submit.grid(row=0, column=0, padx=(0,15))
 
 
@@ -96,11 +97,13 @@ class MainFrame(ttk.Frame):
         """
         # Send play audio event to app
         self.button_text.set("Repeat")
+        self.btn_submit.config(state="enabled")
         self.event_generate('<<RepeatAudio>>')
 
     
     def _on_submit(self):
         # Send save data event to app
+        self.button_text.set("Start")
         self.event_generate('<<SaveRecord>>')
 
 
@@ -119,11 +122,10 @@ class MainFrame(ttk.Frame):
     def reset(self):
         """ Clear all values """   
         for var in self._vars.values():
-            var.set(50)
+            var.set('')
         # Disable submit button on press
         # Set focus to play button
         self.btn_submit.config(state="disabled")
-        self.btn_play.focus()
 
 
 #############################

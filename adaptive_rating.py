@@ -129,22 +129,20 @@ class Application(tk.Tk):
 
     def _load_audiolist_model(self):
         self.audiolist_model = m.AudioList(self.sessionpars)
-        #self._audio_list = self.audiolist_model.fields
         try:
             self.df_audio_data = self.audiolist_model.audio_data
         except:
             print("App_139: Problem creating list of audio files...")
             return
-        #if len(self._audio_list) > 0:
         if len(self.df_audio_data.index) > 0:
             print("App_143: Loaded audio files from AudioList model into runtime environment")
             self.counter = random.choice(np.arange(0,len(self.df_audio_data.index)-1))
-            print(f"App_145: Starting record number: {self.counter}") # Add record name here!!!!
+            print(f"App_145: Starting record number: {self.counter}")
         else:
             print("App_147: No audio files in list!")
             messagebox.showwarning(
                 title="No path selected",
-                message="Please use File>Session to selected a valid audio file directory!"
+                message="Please use File>Session to selecte a valid audio file directory!"
             )
 
 
@@ -175,10 +173,10 @@ class Application(tk.Tk):
     def present_audio(self, *_):
         # Present audio
         print(f"App_175: Playing record #: {self.counter}")
-        filename = self.df_audio_data["Audio List"].iloc[self.counter]
-        print(f"App_177: Record name: {filename}")
+        self.filename = self.df_audio_data["Audio List"].iloc[self.counter]
+        print(f"App_177: Record name: {self.filename}")
         # Audio object expects a full file path and a presentation level
-        audio_obj = m.Audio(filename, self.sessionpars['Presentation Level'].get())
+        audio_obj = m.Audio(self.filename, self.sessionpars['Presentation Level'].get())
         audio_obj.play()
         
 
@@ -188,22 +186,15 @@ class Application(tk.Tk):
          """
         # Get _vars from main_frame view
         data = self.main_frame.get()
-
-
-
-        ###########################################
-        # For tomorrow:
-        # Need to get file name from self.audiodata
-
-
-
         # Update _vars with current audio file name
-        data["Audio Filename"] = self._audio_list[self._records_saved]
+        data["Audio Filename"] = self.filename
         # Pass data dict to CSVModel for saving
         self.model.save_record(data)
         self._records_saved += 1
         self.status.set(f"Trials Completed: {self._records_saved}")
         self.main_frame.reset()
+        # Choose a new random starting index
+        self.counter = random.choice(np.arange(0,len(self.df_audio_data.index)-1))
 
 
     def _quit(self):
