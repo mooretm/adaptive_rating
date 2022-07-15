@@ -10,6 +10,7 @@ pyinstaller = "*"
 scipy = "*"
 matplotlib = "*"
 sounddevice = "*"
+auto-py-to-exe = "*"
 
 [dev-packages]
 

@@ -61,8 +61,6 @@ class MainFrame(ttk.Frame):
         style.configure('Big.TLabelframe.Label', font=("Helvetica", 11))
         style.configure('Big.TButton', font=("Helvetica", 11))
 
-        options = {'padx': 5, 'pady':5} 
-
         # Arrow frame
         frm_arrows = ttk.LabelFrame(self, text="Presentation Controls")
         frm_arrows.grid(row=1, column=0, padx=15, pady=15)
@@ -74,7 +72,9 @@ class MainFrame(ttk.Frame):
                 'bigup':do_big_up,
                 'smallup':do_small_up,
                 'bigdown':do_big_down,
-                'smalldown':do_small_down,
+                'smalldown':do_small_down
+            },
+            repeat_args = {
                 'repeat':self._repeat
             }).grid(row=0, column=0)
 
@@ -85,10 +85,11 @@ class MainFrame(ttk.Frame):
         # Submit button
         self.btn_submit = ttk.Button(frm_button, text="Submit", 
             command=self._on_submit, style='Big.TButton',
-            state="disabled")
+            state="disabled", takefocus=0)
         self.btn_submit.grid(row=0, column=0, padx=(0,15))
 
 
+    # FUNCTIONS
     def _repeat(self):
         """ Present audio. Can be repeated as many times as 
             the listener wants without incrementing the 
