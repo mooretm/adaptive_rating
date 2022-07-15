@@ -15,10 +15,9 @@ class MainMenu(tk.Menu):
             root.event_generate(sequence)
         return callback
 
-    def __init__(self, parent, settings, sessionpars, **kwargs):
+    def __init__(self, parent, sessionpars, **kwargs):
         super().__init__(parent, **kwargs)
 
-        self.settings = settings
         self.sessionpars = sessionpars
 
         # File menu
@@ -43,12 +42,12 @@ class MainMenu(tk.Menu):
 
     def show_about(self):
         """ Show the about dialog """
-        about_message = 'Rating Sliders'
+        about_message = 'Adaptive Ratings'
         about_detail = (
             'Written by: Travis M. Moore\n'
             'Version 1.0.0\n'
             'Created: Jul 11, 2022\n'
-            'Last Edited: Jul 13, 2022'
+            'Last Edited: Jul 15, 2022'
         )
         messagebox.showinfo(
             title='About',

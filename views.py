@@ -14,13 +14,12 @@ import widgets as w
 # Main Application Frame #
 ##########################
 class MainFrame(ttk.Frame):
-    def __init__(self, parent, model, settings, sessionpars, *args, **kwargs):
+    def __init__(self, parent, model, sessionpars, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
         # Initialize
         self.model = model
         self.fields = self.model.fields
-        self.settings = settings
         self.sessionpars = sessionpars
 
         # Data dictionary

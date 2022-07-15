@@ -32,10 +32,6 @@ class Application(tk.Tk):
         self.withdraw()
         self.title("Adaptive Rating Tool")
 
-        # Not really using this here
-        self.settings_model = m.SettingsModel()
-        self._load_settings()
-
         # Load current session parameters (or defaults)
         self.sessionpars_model = m.SessionParsModel()
         self._load_sessionpars()
@@ -53,14 +49,14 @@ class Application(tk.Tk):
 
         # Initialize objects
         self.model = m.CSVModel(self.sessionpars)
-        self.main_frame = v.MainFrame(self, self.model, self.settings, self.sessionpars)
+        self.main_frame = v.MainFrame(self, self.model, self.sessionpars)
         self.main_frame.grid(row=1, column=0)
         self.main_frame.bind('<<SaveRecord>>', self._on_submit)
         self.main_frame.bind('<<RepeatAudio>>', self.present_audio)
         self.main_frame.bind('<<PlayAudio>>', self._get_audio)
 
         # Menu
-        menu = MainMenu(self, self.settings, self.sessionpars)
+        menu = MainMenu(self, self.sessionpars)
         self.config(menu=menu)
         # Create callback dictionary
         event_callbacks = {
@@ -200,38 +196,6 @@ class Application(tk.Tk):
     def _quit(self):
         """ Exit the program """
         self.destroy()
-
-
-
-
-
-
-    def _load_settings(self):
-        """Load settings into our self.settings dict."""
-
-        vartypes = {
-        'bool': tk.BooleanVar,
-        'str': tk.StringVar,
-        'int': tk.IntVar,
-        'float': tk.DoubleVar
-        }
-
-        # Create dict of settings variables from the model's settings.
-        self.settings = dict()
-        for key, data in self.settings_model.fields.items():
-            vartype = vartypes.get(data['type'], tk.StringVar)
-            self.settings[key] = vartype(value=data['value'])
-
-        # Put a trace on the variables so they get stored when changed.
-        for var in self.settings.values():
-            var.trace_add('write', self._save_settings)
-
-
-    def _save_settings(self, *_):
-        """ Save the current settings to a preferences file """
-        for key, variable in self.settings.items():
-            self.settings_model.set(key, variable.get())
-            self.settings_model.save()
 
 
 if __name__ == "__main__":
