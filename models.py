@@ -170,8 +170,8 @@ class SessionParsModel:
         print("Models_153: Writing session pars from model to file...")
         with open(self.filepath, 'w') as fh:
             json.dump(self.fields, fh)
-        
-    
+
+
     def set(self, key, value):
         """ Set a variable value """
         print("Models_160: Setting sessionpars model fields with running vals...")
@@ -208,12 +208,22 @@ class Audio:
         # Read audio file
         fs, audio_file = wavfile.read(self.file_path)
 
+        # Get number of channels
+        try:
+            self.channels = audio_file.shape[1]
+        except IndexError:
+            self.channels = 1
+        print(f"Number of channels: {self.channels}")
+
         # Assign audio file attributes
         self.fs = fs
         self.original_audio = audio_file
         self.dur = len(self.original_audio) / self.fs
-        self.t = np.arange(0,self.dur, 1/self.fs)
-        self.data_type = np.dtype(audio_file[0])
+        self.t = np.arange(0, self.dur, 1/self.fs)
+
+        # Get data type
+        #self.data_type = np.dtype(audio_file[0])
+        self.data_type = audio_file.dtype
         print(f"Incoming audio data type: {self.data_type}")
 
         # Immediately convert to float64 for processing
@@ -225,7 +235,7 @@ class Audio:
             for processing
         """
         if self.data_type == 'float64':
-            pass
+            self.working_audio = self.original_audio
         else:
             # 1. Convert to float64
             sig = self.original_audio.astype(np.float64)
@@ -236,20 +246,25 @@ class Audio:
 
     def play(self):
         """ Present working audio """
-        print(f"Presenting audio data type: {np.dtype(self.working_audio[0])}")
+        #print(f"Presenting audio data type: {np.dtype(self.working_audio[0])}")
+        print(f"Presenting audio data type: {self.working_audio.dtype}")
         # plt.subplot(1,3,1)
         # plt.plot(self.original_audio)
         # plt.subplot(1,3,2)
         # plt.plot(self.working_audio)
 
-        sig = self.setRMS()
-        self.working_audio = sig
-
+        if self.channels == 1:
+            sig = self.setRMS(self.working_audio, self.level)
+            self.working_audio = sig
+        elif self.channels > 1:
+            left = self.setRMS(self.working_audio[:,0], self.level)
+            right = self.setRMS(self.working_audio[:,1], self.level)
+            self.working_audio = np.array([left, right])
         # plt.subplot(1,3,3)
         # plt.plot(self.working_audio)
         # plt.show()
 
-        sd.play(self.working_audio, self.fs)
+        sd.play(self.working_audio.T, self.fs)
         #sd.wait(self.dur+0.5)
 
 
@@ -295,7 +310,7 @@ class Audio:
             return db
 
 
-    def rms(self):
+    def rms(self, sig):
         """ 
             Calculate the root mean square of a signal. 
             
@@ -307,11 +322,11 @@ class Audio:
             Written by: Travis M. Moore
             Last edited: Feb. 3, 2020
         """
-        theRMS = np.sqrt(np.mean(np.square(self.working_audio)))
+        theRMS = np.sqrt(np.mean(np.square(sig)))
         return theRMS
 
 
-    def setRMS(self, eq='n'):
+    def setRMS(self, sig, amp, eq='n'):
         """
             Set RMS level of a 1-channel or 2-channel signal.
         
@@ -335,10 +350,10 @@ class Audio:
             Created: Jan. 10, 2022
             Last edited: May 17, 2022
         """
-        amp = self.level
-        sig = self.working_audio
+        #amp = self.level
+        #sig = self.working_audio
         if len(sig.shape) == 1:
-            rmsdb = self.mag2db(self.rms())
+            rmsdb = self.mag2db(self.rms(sig))
             refdb = amp
             diffdb = np.abs(rmsdb - refdb)
             if rmsdb > refdb:
