@@ -131,9 +131,13 @@ class SessionParsModel:
     fields = {
         'Subject': {'type': 'str', 'value': '999'},
         'Condition': {'type': 'str', 'value': 'Quiet'},
-        'Presentation Level': {'type': 'float', 'value': -50},
+        'Presentation Level': {'type': 'float', 'value': 65},
         'Speaker Number': {'type': 'int', 'value': 1},
-        'Audio Files Path': {'type': 'str', 'value': 'Please select a path'}
+        'Audio Files Path': {'type': 'str', 'value': 'Please select a path'},
+        'Audio Device ID': {'type': 'int', 'value': 999},
+        'Raw Level': {'type': 'float', 'value': -50},
+        'SLM Reading': {'type': 'float', 'value': 70},
+        'Adjusted Presentation Level': {'type': 'float', 'value': -50}
     }
 
 
@@ -244,7 +248,7 @@ class Audio:
             self.working_audio = sig
 
 
-    def play(self):
+    def play(self, device_id, channels):
         """ Present working audio """
         #print(f"Presenting audio data type: {np.dtype(self.working_audio[0])}")
         print(f"Presenting audio data type: {self.working_audio.dtype}")
@@ -252,6 +256,8 @@ class Audio:
         # plt.plot(self.original_audio)
         # plt.subplot(1,3,2)
         # plt.plot(self.working_audio)
+
+        sd.default.device = device_id
 
         if self.channels == 1:
             sig = self.setRMS(self.working_audio, self.level)
@@ -264,7 +270,7 @@ class Audio:
         # plt.plot(self.working_audio)
         # plt.show()
 
-        sd.play(self.working_audio.T, self.fs)
+        sd.play(self.working_audio.T, self.fs, mapping=channels)
         #sd.wait(self.dur+0.5)
 
 

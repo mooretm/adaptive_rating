@@ -6,6 +6,7 @@
 
     Written by: Travis M. Moore
     Created: Jul 11, 2022
+    Last Edited: Sep 26, 2022
 """
 
 # Import GUI packages
@@ -17,6 +18,13 @@ from tkinter import messagebox
 import numpy as np
 import pandas as pd
 import random
+
+# Import audio packages
+import sounddevice as sd
+
+# Import system packages
+import sys
+import os
 
 # Import custom modules
 import views as v
@@ -63,7 +71,12 @@ class Application(tk.Tk):
             '<<FileSession>>': lambda _: self._show_sessionpars(),
             '<<FileQuit>>': lambda _: self.quit(),
             '<<ParsDialogOk>>': lambda _: self._save_sessionpars(),
-            '<<ParsDialogCancel>>': lambda _: self._load_sessionpars()
+            '<<ParsDialogCancel>>': lambda _: self._load_sessionpars(),
+            '<<ToolsSpeaker>>': lambda _: self._show_audioconfig(),
+            '<<AudioParsSubmit>>': lambda _: self._save_sessionpars(),
+            '<<ToolsCalibrate>>': lambda _: self._show_calibration(),
+            '<<CalibrationSubmit>>': lambda _: self._calc_level(),
+            '<<PlayCalibration>>': lambda _: self._play_cal()
         }
         # Bind callbacks to sequences
         for sequence, callback in event_callbacks.items():
@@ -71,7 +84,8 @@ class Application(tk.Tk):
 
         # Status label to display trial count
         self.status = tk.StringVar(value="Trials Completed: 0")
-        ttk.Label(self, textvariable=self.status).grid(sticky='w', padx=15, pady=(0,5))
+        ttk.Label(self, textvariable=self.status).grid(
+            sticky='w', padx=15, pady=(0,5))
         # Track trial number
         self._records_saved = 0
 
@@ -92,10 +106,74 @@ class Application(tk.Tk):
         toplevel.geometry("+%d+%d" % (x, y)) 
 
 
+    def _show_audioconfig(self):
+        print("App_97: Calling audio config dialog...")
+        v.AudioParams(self, self.sessionpars)
+
+    
+    def _show_calibration(self):
+        print("App_105: Calling calibration dialog...")
+        v.Calibration(self, self.sessionpars)
+
+
     def _show_sessionpars(self):
         """ Show the session parameters dialog """
         print("App_93: Calling sessionpars dialog...")
-        v.SessionParams(self, sessionpars=self.sessionpars, title="Parameters", error='')
+        v.SessionParams(self, sessionpars=self.sessionpars, 
+            title="Parameters", error='')
+
+
+    def _calc_level(self):
+        slm_offset = self.sessionpars['SLM Reading'].get() - self.sessionpars['Raw Level'].get()
+        self.sessionpars['Adjusted Presentation Level'].set(self.sessionpars['Presentation Level'].get() - slm_offset)
+        self._save_sessionpars()
+
+
+    def resource_path(self, relative_path):
+        """ Get the absolute path to the resource 
+            Works for dev and for PyInstaller
+        """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
+
+
+    def _play_cal(self):
+        #fs = 48000
+        #dur = 3
+        #wgn = self.mk_wgn(fs=fs, dur=dur)
+        #wgn = self.doNormalize(wgn)
+        #sd.play(wgn, fs)
+        #sd.wait(dur)
+
+        # Get resource path for calibration wav file
+        cal_file = self.resource_path('cal_stim.wav')
+
+        # Create calibration audio object
+        cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+
+        # Present calibration stimulus
+        cal_stim.play(device_id=self.sessionpars['Audio Device ID'].get(), 
+            channels=self.sessionpars['Speaker Number'].get())
+    
+
+    def mk_wgn(self,fs,dur):
+        """ Function to generate white Gaussian noise.
+        """
+        #random.seed(4)
+        wgn = [random.gauss(0.0, 1.0) for i in range(fs*dur)]
+        wgn = self.doNormalize(wgn)
+        return wgn
+
+
+    def doNormalize(self,sig):
+        sig = sig - np.mean(sig) # remove DC offset
+        sig = sig / np.max(abs(sig)) # normalize
+        return sig
 
 
     def _load_sessionpars(self):
@@ -171,10 +249,15 @@ class Application(tk.Tk):
         print(f"App_175: Playing record #: {self.counter}")
         self.filename = self.df_audio_data["Audio List"].iloc[self.counter]
         print(f"App_177: Record name: {self.filename}")
+
+        # Create audio object from stimulus list
         # Audio object expects a full file path and a presentation level
-        audio_obj = m.Audio(self.filename, self.sessionpars['Presentation Level'].get())
-        audio_obj.play()
-        
+        audio_obj = m.Audio(self.filename, self.sessionpars['Adjusted Presentation Level'].get())
+
+        # Present wav file stimulus
+        audio_obj.play(device_id=self.sessionpars['Audio Device ID'].get(),
+            channels=self.sessionpars['Speaker Number'].get())
+
 
     def _on_submit(self, *_):
         """ Save trial ratings, update trial counter,

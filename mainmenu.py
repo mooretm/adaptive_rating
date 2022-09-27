@@ -32,6 +32,20 @@ class MainMenu(tk.Menu):
             command=self._event('<<FileQuit>>')
         )
         self.add_cascade(label='File', menu=file_menu)
+
+        # Tools menu
+        tools_menu = tk.Menu(self, tearoff=False)
+        tools_menu.add_command(
+            label="Audio Settings...",
+            command=self._event('<<ToolsSpeaker>>')
+        )
+        tools_menu.add_command(
+            label="Calibration...",
+            command=self._event('<<ToolsCalibrate>>')
+        )
+        self.add_cascade(label='Tools', menu=tools_menu)
+
+
         # Help menu
         help_menu = tk.Menu(self, tearoff=False)
         help_menu.add_command(
@@ -45,9 +59,9 @@ class MainMenu(tk.Menu):
         about_message = 'Adaptive Ratings'
         about_detail = (
             'Written by: Travis M. Moore\n'
-            'Version 1.0.0\n'
+            'Version 1.1.1\n'
             'Created: Jul 11, 2022\n'
-            'Last Edited: Jul 15, 2022'
+            'Last Edited: Sep 26, 2022'
         )
         messagebox.showinfo(
             title='About',
