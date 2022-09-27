@@ -125,7 +125,9 @@ class Application(tk.Tk):
 
     def _calc_level(self):
         slm_offset = self.sessionpars['SLM Reading'].get() - self.sessionpars['Raw Level'].get()
+        print(f"SLM offset: {slm_offset}")
         self.sessionpars['Adjusted Presentation Level'].set(self.sessionpars['Presentation Level'].get() - slm_offset)
+        print(f"Calculated level from _calc_level: {self.sessionpars['Adjusted Presentation Level'].get()}")
         self._save_sessionpars()
 
 
@@ -143,37 +145,34 @@ class Application(tk.Tk):
 
 
     def _play_cal(self):
-        #fs = 48000
-        #dur = 3
-        #wgn = self.mk_wgn(fs=fs, dur=dur)
-        #wgn = self.doNormalize(wgn)
-        #sd.play(wgn, fs)
-        #sd.wait(dur)
-
-        # Get resource path for calibration wav file
-        cal_file = self.resource_path('cal_stim.wav')
-
         # Create calibration audio object
-        cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+        try:
+            # If running from compiled, look in compiled temporary location
+            cal_file = self.resource_path('cal_stim.wav')
+            cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+        except FileNotFoundError:
+            # If running from command line, look in assets folder
+            cal_file = '.\\assets\\cal_stim.wav'
+            cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
 
         # Present calibration stimulus
         cal_stim.play(device_id=self.sessionpars['Audio Device ID'].get(), 
             channels=self.sessionpars['Speaker Number'].get())
     
 
-    def mk_wgn(self,fs,dur):
-        """ Function to generate white Gaussian noise.
-        """
-        #random.seed(4)
-        wgn = [random.gauss(0.0, 1.0) for i in range(fs*dur)]
-        wgn = self.doNormalize(wgn)
-        return wgn
+    # def mk_wgn(self,fs,dur):
+    #     """ Function to generate white Gaussian noise.
+    #     """
+    #     #random.seed(4)
+    #     wgn = [random.gauss(0.0, 1.0) for i in range(fs*dur)]
+    #     wgn = self.doNormalize(wgn)
+    #     return wgn
 
 
-    def doNormalize(self,sig):
-        sig = sig - np.mean(sig) # remove DC offset
-        sig = sig / np.max(abs(sig)) # normalize
-        return sig
+    # def doNormalize(self,sig):
+    #     sig = sig - np.mean(sig) # remove DC offset
+    #     sig = sig / np.max(abs(sig)) # normalize
+    #     return sig
 
 
     def _load_sessionpars(self):
@@ -196,6 +195,7 @@ class Application(tk.Tk):
     def _save_sessionpars(self, *_):
         """ Save the current settings to a preferences file """
         print("App_125: Calling sessionpar model set vars and save functions")
+
         for key, variable in self.sessionpars.items():
             self.sessionpars_model.set(key, variable.get())
             self.sessionpars_model.save()
@@ -250,8 +250,13 @@ class Application(tk.Tk):
         self.filename = self.df_audio_data["Audio List"].iloc[self.counter]
         print(f"App_177: Record name: {self.filename}")
 
+        # Calculate adjusted presentation level in case of change
+        self._calc_level()
+
         # Create audio object from stimulus list
         # Audio object expects a full file path and a presentation level
+        print(f"Adjusted presentation level: {self.sessionpars['Adjusted Presentation Level'].get()}")
+        print(type(self.sessionpars['Adjusted Presentation Level'].get()))
         audio_obj = m.Audio(self.filename, self.sessionpars['Adjusted Presentation Level'].get())
 
         # Present wav file stimulus
