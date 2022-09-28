@@ -212,7 +212,7 @@ class Calibration(tk.Toplevel):
 
 
     def _on_submit(self):
-        print("View_195: Sending save calibration event...")
+        print("View_215: Sending save calibration event...")
         self.parent.event_generate('<<CalibrationSubmit>>')
         self.destroy()
 
@@ -291,7 +291,7 @@ class AudioParams(tk.Toplevel):
 
 
     def _on_submit(self):
-        print("View_194: Sending save audio config event...")
+        print("View_294: Sending save audio config event...")
         self.parent.event_generate('<<AudioParsSubmit>>')
         self.destroy()
 
@@ -357,12 +357,12 @@ class SessionParams(Dialog):
 
 
     def ok(self):
-        print("View:184: Sending save event...")
+        print("View_360: Sending save event...")
         self.parent.event_generate('<<ParsDialogOk>>')
         self.destroy()
 
     
     def cancel(self):
-        print("View:190: Sending load event...")
+        print("View_366: Sending load event...")
         self.parent.event_generate('<<ParsDialogCancel>>')
         self.destroy()

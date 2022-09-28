@@ -126,8 +126,10 @@ class Application(tk.Tk):
     def _calc_level(self):
         slm_offset = self.sessionpars['SLM Reading'].get() - self.sessionpars['Raw Level'].get()
         print(f"SLM offset: {slm_offset}")
-        self.sessionpars['Adjusted Presentation Level'].set(self.sessionpars['Presentation Level'].get() - slm_offset)
-        print(f"Calculated level from _calc_level: {self.sessionpars['Adjusted Presentation Level'].get()}")
+        self.sessionpars['Adjusted Presentation Level'].set(
+            self.sessionpars['Presentation Level'].get() - slm_offset)
+        print(f"Calculated level from _calc_level: " +
+            f"{self.sessionpars['Adjusted Presentation Level'].get()}")
         self._save_sessionpars()
 
 
@@ -177,7 +179,8 @@ class Application(tk.Tk):
         for key, data in self.sessionpars_model.fields.items():
             vartype = vartypes.get(data['type'], tk.StringVar)
             self.sessionpars[key] = vartype(value=data['value'])
-        print("App_180: Loaded sessionpars model fields into running sessionpars dict")
+        print("App_180: Loaded sessionpars model fields into " +
+            "running sessionpars dict")
 
 
     def _save_sessionpars(self, *_):
@@ -197,14 +200,17 @@ class Application(tk.Tk):
             print("App_197: Problem creating list of audio files...")
             return
         if len(self.df_audio_data.index) > 0:
-            print("App_200: Loaded audio files from AudioList model into runtime environment")
-            self.counter = random.choice(np.arange(0,len(self.df_audio_data.index)-1))
+            print("App_200: Loaded audio files from AudioList model into " + 
+                "runtime environment")
+            self.counter = random.choice(
+                np.arange(0,len(self.df_audio_data.index)-1))
             print(f"App_145: Starting record number: {self.counter}")
         else:
             print("App_204: No audio files in list!")
             messagebox.showwarning(
                 title="No path selected",
-                message="Please use File>Session to selecte a valid audio file directory!"
+                message="Please use File>Session to select a valid " +
+                    "audio file directory!"
             )
 
 
@@ -243,9 +249,11 @@ class Application(tk.Tk):
 
         # Create audio object from stimulus list
         # Audio object expects a full file path and a presentation level
-        print(f"Adjusted presentation level: {self.sessionpars['Adjusted Presentation Level'].get()}")
+        print(f"Adjusted presentation level: " + 
+            f"{self.sessionpars['Adjusted Presentation Level'].get()}")
         print(type(self.sessionpars['Adjusted Presentation Level'].get()))
-        audio_obj = m.Audio(self.filename, self.sessionpars['Adjusted Presentation Level'].get())
+        audio_obj = m.Audio(self.filename, 
+            self.sessionpars['Adjusted Presentation Level'].get())
 
         # Present wav file stimulus
         audio_obj.play(device_id=self.sessionpars['Audio Device ID'].get(),
@@ -266,7 +274,8 @@ class Application(tk.Tk):
         self.status.set(f"Trials Completed: {self._records_saved}")
         self.main_frame.reset()
         # Choose a new random starting index
-        self.counter = random.choice(np.arange(0,len(self.df_audio_data.index)-1))
+        self.counter = random.choice(
+            np.arange(0,len(self.df_audio_data.index)-1))
 
 
     def _quit(self):
