@@ -1,12 +1,10 @@
 """ View for Adaptive Rating """
 
 # Import GUI packages
-from sre_parse import State
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter.simpledialog import Dialog
-from turtle import title
 
 # Import data science packages
 from pandastable import Table
@@ -37,7 +35,6 @@ class MainFrame(ttk.Frame):
             'Button ID': tk.StringVar(),
             'Audio Filename': tk.StringVar()
         }
-
 
         # Button functions
         def do_big_up():
@@ -71,11 +68,11 @@ class MainFrame(ttk.Frame):
         style.configure('Big.TLabelframe.Label', font=("Helvetica", 11))
         style.configure('Big.TButton', font=("Helvetica", 11))
 
-        # Arrow frame
+        # Arrow buttons frame
         frm_arrows = ttk.LabelFrame(self, text="Presentation Controls")
         frm_arrows.grid(row=1, column=0, padx=15, pady=15)
 
-        # Arrow controls
+        # Arrow buttons controls
         self.button_text = tk.StringVar(value="Start")
         w.ArrowGroup(frm_arrows, button_text=self.button_text, 
             command_args = {
@@ -161,7 +158,7 @@ class Calibration(tk.Toplevel):
         lf_record.grid(column=1, row=0, **options)
 
         # Raw level
-        lbl_play = ttk.Label(lf_present, text="Raw Level:").grid(
+        lbl_play = ttk.Label(lf_present, text="Raw Level (dB FS):").grid(
             column=5, row=5, sticky='e', **options_small)
         ent_slm = ttk.Entry(lf_present, textvariable=self.sessionpars['Raw Level'],
             width=6)
@@ -224,7 +221,6 @@ class Calibration(tk.Toplevel):
 # Audio Parameters Dialog #
 ###########################
 class AudioParams(tk.Toplevel):
-    #def __init__(self, parent, sessionpars, title, error=''):
     def __init__(self, parent, sessionpars, *args, **kwargs):
         super().__init__(parent, *args, *kwargs)
         self.parent = parent
@@ -232,49 +228,38 @@ class AudioParams(tk.Toplevel):
 
         self.withdraw()
         self.focus()
-        self.title("Audio Settings")
+        self.title("Audio")
         #self.grab_set() # Disable root window (toplevel as modal window)
 
         options = {'padx':10, 'pady':10}
         options_small = {'padx':2.5, 'pady':2.5}
 
-        #frmID = ttk.Frame(self)
-        #frmID.grid(column=0, row=0, **options)
-
-        lblfrm_settings = ttk.Labelframe(self, text='Audio Settings')
+        lblfrm_settings = ttk.Labelframe(self, text='Device and Routing')
         lblfrm_settings.grid(column=0, row=0, sticky='nsew', **options)
-        lblfrm_settings.columnconfigure([0,1,2,3,4,5], weight=1)
 
         frmTable = ttk.Frame(self)
         frmTable.grid(column=0, row=15, **options)
 
         # Speaker number
-        lbl_speaker = ttk.Label(lblfrm_settings, text='Output Speaker(s):').grid(
-            column=0, row=5, sticky='e', **options_small)
+        lbl_speaker = ttk.Label(lblfrm_settings, text='Output Speaker:').grid(
+            column=5, row=5, sticky='e', **options_small)
         ent_speaker = ttk.Entry(lblfrm_settings, 
             textvariable=self.sessionpars['Speaker Number'], width=6)
-        ent_speaker.grid(column=1, row=5, sticky='w', **options_small)
-
-        # Level
-        lbl_level = ttk.Label(lblfrm_settings, text='Raw Level:').grid(
-            column=2, row=5, sticky='e', **options_small)
-        ent_speaker = ttk.Entry(lblfrm_settings, 
-            textvariable=self.sessionpars['Raw Level'], width=6)
-        ent_speaker.grid(column=3, row=5, sticky='w', **options_small)
+        ent_speaker.grid(column=10, row=5, sticky='w', **options_small)
 
         # Audio device ID
         lbl_device = ttk.Label(lblfrm_settings, text="Audio Device ID:").grid(
-            column=4, row=5, sticky='e', **options_small)
+            column= 5, row=10, sticky='e', **options_small)
         ent_deviceID = ttk.Entry(lblfrm_settings, 
             textvariable=self.sessionpars['Audio Device ID'], width=6)
-        ent_deviceID.grid(column=5, row=5, sticky='w', **options_small)
+        ent_deviceID.grid(column=10, row=10, sticky='w', **options_small)
 
         # Submit button
         btnDeviceID = ttk.Button(self, text="Submit", 
             command=self._on_submit)
         btnDeviceID.grid(column=0, columnspan=10, row=10, **options_small)
 
-        # Get list of audio devices
+        # Get and display list of audio devices
         deviceList = sd.query_devices()
         names = [deviceList[x]['name'] for x in np.arange(0,len(deviceList))]
         chans_out =  [deviceList[x]['max_output_channels'] for x in np.arange(0,len(deviceList))]
@@ -283,8 +268,6 @@ class AudioParams(tk.Toplevel):
             "device_id": ids, 
             "name": names, 
             "chans_out": chans_out})
-        #df = df[df['chans_out'] > 0]
-
         pt = Table(frmTable, dataframe=df, showtoolbar=True, showstatusbar=True)
         table = pt = Table(frmTable, dataframe=df)
         table.grid(column=0, row=0)
@@ -317,7 +300,8 @@ class AudioParams(tk.Toplevel):
 # Session Parameters Dialog #
 #############################
 class SessionParams(Dialog):
-    """ A dialog for setting session parameters """
+    """ Dialog for setting session parameters
+    """
     def __init__(self, parent, sessionpars, title, error=''):
         self.sessionpars = sessionpars
         self._error = tk.StringVar(value=error)
@@ -330,7 +314,6 @@ class SessionParams(Dialog):
         if self._error.get():
             ttk.Label(main_frame, textvariable=self._error).grid(row=1, column=0, **options)
 
-        #ttk.Label(frame, text="Please Enter Session Parameters").grid(row=0, column=0, columnspan=3, **options)
         frame = ttk.Labelframe(main_frame, text='Session Information')
         frame.grid()
 

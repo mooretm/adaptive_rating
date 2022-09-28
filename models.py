@@ -30,10 +30,10 @@ class AudioList:
         
         self.sessionpars = sessionpars
 
-        print("Models_29: Checking for audio files dir...")
+        print("Models_33: Checking for audio files dir...")
         # If the file doesn't exist, return
         if not os.path.exists(self.sessionpars['Audio Files Path'].get()):
-            print("Models_34: Not a valid audio files directory!")
+            print("Models_36: Not a valid audio files directory!")
             return
         # If a valid path has been given, get the files
         #self.fields['Audio List'] = os.listdir(self.sessionpars['Audio Files Path'].get())
@@ -49,7 +49,7 @@ class AudioList:
         self.audio_data = pd.DataFrame(self.fields)
         # Sort dataframe by Parameter
         self.audio_data = self.audio_data.sort_values(by='Parameter').reset_index(drop=True)
-        print("Models_43: Audio file data frame loaded into AudioList model")
+        print("Models_52: Audio file data frame loaded into AudioList model")
         print(self.audio_data)
 
 
@@ -57,7 +57,7 @@ class CSVModel:
     """ CSV file storage """
     def __init__(self, sessionpars):
 
-        # Initialize sessionpars
+        # Initialize session parameter dictionary
         self.sessionpars = sessionpars
 
         # Generate date stamp
@@ -70,7 +70,9 @@ class CSVModel:
 
     
     def save_record(self, data):
-        """ Save a dictionary of data to .csv file """
+        """ Save a dictionary of data to .csv file 
+        """
+        # Create file name and path
         filename = f"{self.datestamp}_{self.sessionpars['Condition'].get()}_{self.sessionpars['Subject'].get()}.csv"
         self.file = Path(filename)
 
@@ -127,7 +129,9 @@ class CSVModel:
 
 
 class SessionParsModel:
-    """ A model for saving session parameters """
+    """ A model for saving session parameters 
+    """
+    # Define dictionary items
     fields = {
         'Subject': {'type': 'str', 'value': '999'},
         'Condition': {'type': 'str', 'value': 'Quiet'},
@@ -140,7 +144,6 @@ class SessionParsModel:
         'Adjusted Presentation Level': {'type': 'float', 'value': -50}
     }
 
-
     def __init__(self):
         filename = 'adaptive_rating_pars.json'
         # Store settings file in user's home directory
@@ -151,18 +154,18 @@ class SessionParsModel:
 
     def load(self):
         """ Load the settings from the file """
-        print("Models_78: Checking for pars file...")
-        # If the file doesn't exist, return
+        print("Models_157: Checking for pars file...")
+        # If the file doesn't exist, abort
         if not self.filepath.exists():
             return
 
         # Open the file and read in the raw values
-        print("Models_84: File found - reading raw vals from pars file...")
+        print("Models_163: File found - reading raw vals from pars file...")
         with open(self.filepath, 'r') as fh:
             raw_values = json.load(fh)
 
         # Don't implicitly trust the raw values; only get known keys
-        print("Models_89: Loading vals into sessionpars model if they match model keys")
+        print("Models_168: Loading vals into sessionpars model if they match model keys")
         for key in self.fields:
             if key in raw_values and 'value' in raw_values[key]:
                 raw_value = raw_values[key]['value']
@@ -171,14 +174,14 @@ class SessionParsModel:
 
     def save(self):
         """ Save the current settings to the file """
-        print("Models_153: Writing session pars from model to file...")
+        print("Models_177: Writing session pars from model to file...")
         with open(self.filepath, 'w') as fh:
             json.dump(self.fields, fh)
 
 
     def set(self, key, value):
         """ Set a variable value """
-        print("Models_160: Setting sessionpars model fields with running vals...")
+        print("Models_184: Setting sessionpars model fields with running vals...")
         if (
             key in self.fields and 
             type(value).__name__ == self.fields[key]['type']

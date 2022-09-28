@@ -6,7 +6,7 @@
 
     Written by: Travis M. Moore
     Created: Jul 11, 2022
-    Last Edited: Sep 26, 2022
+    Last Edited: Sep 28, 2022
 """
 
 # Import GUI packages
@@ -52,7 +52,6 @@ class Application(tk.Tk):
         # Make audio files list model
         self._audio_list = pd.DataFrame()
         self.audio_data = pd.DataFrame()
-        #self.audiolist_model = m.AudioList(self.sessionpars)
         self._load_audiolist_model()
 
         # Initialize objects
@@ -90,7 +89,7 @@ class Application(tk.Tk):
         self._records_saved = 0
 
         # Set up root window
-        self.deiconify()
+        #self.deiconify()
 
         self.center_window()
 
@@ -104,23 +103,24 @@ class Application(tk.Tk):
         x = screen_width/2 - size[0]/2
         y = screen_height/2 - size[1]/2
         toplevel.geometry("+%d+%d" % (x, y)) 
+        toplevel.deiconify()
 
 
     def _show_audioconfig(self):
-        print("App_97: Calling audio config dialog...")
+        print("App_110: Calling audio config dialog...")
         v.AudioParams(self, self.sessionpars)
 
     
     def _show_calibration(self):
-        print("App_105: Calling calibration dialog...")
+        print("App_115: Calling calibration dialog...")
         v.Calibration(self, self.sessionpars)
 
 
     def _show_sessionpars(self):
         """ Show the session parameters dialog """
-        print("App_93: Calling sessionpars dialog...")
+        print("App_121: Calling sessionpars dialog...")
         v.SessionParams(self, sessionpars=self.sessionpars, 
-            title="Parameters", error='')
+            title="Session", error='')
 
 
     def _calc_level(self):
@@ -145,6 +145,8 @@ class Application(tk.Tk):
 
 
     def _play_cal(self):
+        """ Load calibration file and present
+        """
         # Create calibration audio object
         try:
             # If running from compiled, look in compiled temporary location
@@ -160,23 +162,9 @@ class Application(tk.Tk):
             channels=self.sessionpars['Speaker Number'].get())
     
 
-    # def mk_wgn(self,fs,dur):
-    #     """ Function to generate white Gaussian noise.
-    #     """
-    #     #random.seed(4)
-    #     wgn = [random.gauss(0.0, 1.0) for i in range(fs*dur)]
-    #     wgn = self.doNormalize(wgn)
-    #     return wgn
-
-
-    # def doNormalize(self,sig):
-    #     sig = sig - np.mean(sig) # remove DC offset
-    #     sig = sig / np.max(abs(sig)) # normalize
-    #     return sig
-
-
     def _load_sessionpars(self):
-        """ Load parameters into self.sessionpars dict """
+        """ Load parameters into self.sessionpars dict 
+        """
         vartypes = {
         'bool': tk.BooleanVar,
         'str': tk.StringVar,
@@ -189,12 +177,12 @@ class Application(tk.Tk):
         for key, data in self.sessionpars_model.fields.items():
             vartype = vartypes.get(data['type'], tk.StringVar)
             self.sessionpars[key] = vartype(value=data['value'])
-        print("App_120: Loaded sessionpars model fields into running sessionpars dict")
+        print("App_180: Loaded sessionpars model fields into running sessionpars dict")
 
 
     def _save_sessionpars(self, *_):
         """ Save the current settings to a preferences file """
-        print("App_125: Calling sessionpar model set vars and save functions")
+        print("App_185: Calling sessionpar model set vars and save functions")
 
         for key, variable in self.sessionpars.items():
             self.sessionpars_model.set(key, variable.get())
@@ -206,14 +194,14 @@ class Application(tk.Tk):
         try:
             self.df_audio_data = self.audiolist_model.audio_data
         except:
-            print("App_139: Problem creating list of audio files...")
+            print("App_197: Problem creating list of audio files...")
             return
         if len(self.df_audio_data.index) > 0:
-            print("App_143: Loaded audio files from AudioList model into runtime environment")
+            print("App_200: Loaded audio files from AudioList model into runtime environment")
             self.counter = random.choice(np.arange(0,len(self.df_audio_data.index)-1))
             print(f"App_145: Starting record number: {self.counter}")
         else:
-            print("App_147: No audio files in list!")
+            print("App_204: No audio files in list!")
             messagebox.showwarning(
                 title="No path selected",
                 message="Please use File>Session to selecte a valid audio file directory!"
@@ -246,9 +234,9 @@ class Application(tk.Tk):
 
     def present_audio(self, *_):
         # Present audio
-        print(f"App_175: Playing record #: {self.counter}")
+        print(f"App_237: Playing record #: {self.counter}")
         self.filename = self.df_audio_data["Audio List"].iloc[self.counter]
-        print(f"App_177: Record name: {self.filename}")
+        print(f"App_239: Record name: {self.filename}")
 
         # Calculate adjusted presentation level in case of change
         self._calc_level()

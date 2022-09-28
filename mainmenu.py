@@ -56,12 +56,12 @@ class MainMenu(tk.Menu):
 
     def show_about(self):
         """ Show the about dialog """
-        about_message = 'Adaptive Ratings'
+        about_message = 'Adaptive Rating Tool'
         about_detail = (
             'Written by: Travis M. Moore\n'
-            'Version 1.1.1\n'
+            'Version 1.1.2\n'
             'Created: Jul 11, 2022\n'
-            'Last Edited: Sep 26, 2022'
+            'Last Edited: Sep 28, 2022'
         )
         messagebox.showinfo(
             title='About',
