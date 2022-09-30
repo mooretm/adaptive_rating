@@ -110,6 +110,7 @@ class CSVModel:
         # Fields to remove from dictionary before saving it
         all_data.pop('audio_files_path') # Don't care about directory
         all_data.pop('button_id') # Don't care about last button pressed
+        all_data.pop('calibration_file') # Don't care about calibration file
 
         # Create new field for trailing underscore naming
         # See naming convention info above
@@ -141,7 +142,8 @@ class SessionParsModel:
         'Audio Device ID': {'type': 'int', 'value': 999},
         'Raw Level': {'type': 'float', 'value': -50},
         'SLM Reading': {'type': 'float', 'value': 70},
-        'Adjusted Presentation Level': {'type': 'float', 'value': -50}
+        'Adjusted Presentation Level': {'type': 'float', 'value': -50},
+        'Calibration File': {'type': 'str', 'value': 'cal_stim.wav'}
     }
 
     def __init__(self):

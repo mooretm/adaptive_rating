@@ -6,7 +6,7 @@
 
     Written by: Travis M. Moore
     Created: Jul 11, 2022
-    Last Edited: Sep 28, 2022
+    Last Edited: Sep 30, 2022
 """
 
 # Import GUI packages
@@ -75,7 +75,7 @@ class Application(tk.Tk):
             '<<AudioParsSubmit>>': lambda _: self._save_sessionpars(),
             '<<ToolsCalibrate>>': lambda _: self._show_calibration(),
             '<<CalibrationSubmit>>': lambda _: self._calc_level(),
-            '<<PlayCalibration>>': lambda _: self._play_cal()
+            '<<PlayCalStim>>': lambda _: self._play_cal()
         }
         # Bind callbacks to sequences
         for sequence, callback in event_callbacks.items():
@@ -149,15 +149,21 @@ class Application(tk.Tk):
     def _play_cal(self):
         """ Load calibration file and present
         """
-        # Create calibration audio object
-        try:
-            # If running from compiled, look in compiled temporary location
-            cal_file = self.resource_path('cal_stim.wav')
-            cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
-        except FileNotFoundError:
-            # If running from command line, look in assets folder
-            cal_file = '.\\assets\\cal_stim.wav'
-            cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+         # Check for default calibration stimulus request
+        if self.sessionpars['Calibration File'].get() == 'cal_stim.wav':
+            # Create calibration audio object
+            try:
+                # If running from compiled, look in compiled temporary location
+                cal_file = self.resource_path('cal_stim.wav')
+                cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+            except FileNotFoundError:
+                # If running from command line, look in assets folder
+                cal_file = '.\\assets\\cal_stim.wav'
+                cal_stim = m.Audio(cal_file, self.sessionpars['Raw Level'].get())
+        else: # Custom calibration file was provided
+            print("Reading provided calibration file...")
+            cal_stim = m.Audio(self.sessionpars['Calibration File'].get(), 
+                self.sessionpars['Raw Level'].get())
 
         # Present calibration stimulus
         cal_stim.play(device_id=self.sessionpars['Audio Device ID'].get(), 
