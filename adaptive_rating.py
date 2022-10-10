@@ -6,7 +6,7 @@
 
     Written by: Travis M. Moore
     Created: Jul 11, 2022
-    Last Edited: Sep 30, 2022
+    Last Edited: Oct 10, 2022
 """
 
 # Import GUI packages
@@ -237,8 +237,20 @@ class Application(tk.Tk):
         df_len = int(len(self.df_audio_data.index)-1)
         if self.counter >= df_len:
             self.counter = df_len
+            #self.main_frame.event_generate('<<LowerLimit>>')
+            print("App_241: Limit reached!")
+            messagebox.showwarning(
+                title='Limit Reached!',
+                message="You are at the limit"
+            )
         elif self.counter <= 0:
             self.counter = 0
+            #self.main_frame.event_generate('<<UpperLimit>>')
+            print("App_250: Limit reached!")
+            messagebox.showwarning(
+                title='Limit Reached!',
+                message="You are at the limit"
+            )
 
         # Present audio
         self.present_audio()

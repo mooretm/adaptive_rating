@@ -39,6 +39,11 @@ class MainFrame(ttk.Frame):
             'Audio Filename': tk.StringVar()
         }
 
+        # Just using message boxes to indicate limits now
+        # These event calls changed the background color, etc.
+        #self.bind('<<UpperLimit>>', self._upper_limit) 
+        #self.bind('<<LowerLimit>>', self._lower_limit) 
+        
         # Button functions
         def do_big_up():
             """ Send button ID and play event """
@@ -70,14 +75,15 @@ class MainFrame(ttk.Frame):
         style.configure('Big.TLabel', font=("Helvetica", 14))
         style.configure('Big.TLabelframe.Label', font=("Helvetica", 11))
         style.configure('Big.TButton', font=("Helvetica", 11))
+        style.configure('Red.TFrame', background='red')
 
         # Arrow buttons frame
-        frm_arrows = ttk.LabelFrame(self, text="Presentation Controls")
-        frm_arrows.grid(row=1, column=0, padx=15, pady=15)
+        self.frm_arrows = ttk.LabelFrame(self, text="Presentation Controls")
+        self.frm_arrows.grid(row=1, column=0, padx=15, pady=15)
 
         # Arrow buttons controls
         self.button_text = tk.StringVar(value="Start")
-        w.ArrowGroup(frm_arrows, button_text=self.button_text, 
+        w.ArrowGroup(self.frm_arrows, button_text=self.button_text, 
             command_args = {
                 'bigup':do_big_up,
                 'smallup':do_small_up,
@@ -100,6 +106,12 @@ class MainFrame(ttk.Frame):
 
 
     # FUNCTIONS
+    # def _upper_limit(self, *_):
+    #     print('Call received at upper limit')
+    #     self.config(style='Red.TFrame')
+    #     self.frm_arrows.config(text='Limit Reached!')
+
+
     def _repeat(self):
         """ Present audio. Can be repeated as many times as 
             the listener wants without incrementing the 

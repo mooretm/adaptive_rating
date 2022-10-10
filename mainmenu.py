@@ -59,9 +59,9 @@ class MainMenu(tk.Menu):
         about_message = 'Adaptive Rating Tool'
         about_detail = (
             'Written by: Travis M. Moore\n'
-            'Version 1.2.0\n'
+            'Version 1.2.1\n'
             'Created: Jul 11, 2022\n'
-            'Last Edited: Sep 30, 2022'
+            'Last Edited: Oct 10, 2022'
         )
         messagebox.showinfo(
             title='About',
